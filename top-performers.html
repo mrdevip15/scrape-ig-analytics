@@ -303,30 +303,28 @@
 
       try {
         const resMonths = await fetch('/api/months');
-        const months = await resMonths.json();
-        const monthSelect = document.getElementById('monthSelect');
-        if (months.length > 0) {
-          monthSelect.innerHTML = months.map(m => `<option value="${m}">${m}</option>`).join('');
+        if (resMonths.ok) {
+          const months = await resMonths.json();
+          const monthSelect = document.getElementById('monthSelect');
+          if (monthSelect && Array.isArray(months) && months.length > 0) {
+            monthSelect.innerHTML = months.map(m => `<option value="${m}">${m}</option>`).join('');
+          }
         }
-      } catch {}
+      } catch (e) {
+        /* Ignore API endpoint failure on static GitHub Pages */
+      }
 
       await loadData();
     }
 
-        async function loadData() {
-      const month = document.getElementById('monthSelect')?.value || '2026-08';
+    async function loadData() {
+      const month = document.getElementById('monthSelect').value || '2026-08';
       try {
-        let res = await fetch(`/api/dashboard?month=${month}`);
-        if (!res.ok) throw new Error('GitHub Pages Static Mode');
+        const res = await fetch(`/api/dashboard?month=${month}`);
         globalData = await res.json();
+        currentBranches = globalData.branches || [];
+        renderTable();
       } catch (e) {
-        // Fallback for GitHub Pages static hosting
-        const resStatic = await fetch(`./data/${month}/dashboard.json`);
-        globalData = await resStatic.json();
-      }
-      currentBranches = globalData.branches || [];
-      renderTable();
-    } catch (e) {
         console.error(e);
       }
     }

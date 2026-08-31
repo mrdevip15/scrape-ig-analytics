@@ -1525,37 +1525,51 @@
 
       try {
         const resMonths = await fetch('/api/months');
-        const months = await resMonths.json();
-        const monthSelect = document.getElementById('monthSelect');
-        if (months.length > 0) {
-          monthSelect.innerHTML = months.map(m => `<option value="${m}">Bulan: ${m}</option>`).join('');
+        if (resMonths.ok) {
+          const months = await resMonths.json();
+          const monthSelect = document.getElementById('monthSelect');
+          if (monthSelect && Array.isArray(months) && months.length > 0) {
+            monthSelect.innerHTML = months.map(m => `<option value="${m}">Bulan: ${m}</option>`).join('');
+          }
         }
-        await loadDashboard(monthSelect.value || '2026-08');
       } catch (e) {
-        console.error('Failed to init dashboard:', e);
+        /* Ignore API endpoint failure on static GitHub Pages */
       }
+
+      const monthSelect = document.getElementById('monthSelect');
+      await loadDashboard(monthSelect?.value || '2026-08');
     }
 
     async function loadDashboard(month) {
       try {
-        const res = await fetch(`/api/dashboard?month=${month}`);
+        let res = await fetch(`/api/dashboard?month=${month}`);
+        if (!res.ok) throw new Error('GitHub Pages Static Mode');
         globalData = await res.json();
-        currentBranches = globalData.branches || [];
-
-        // Merge followers_master into branch summaries
-        const fm = globalData.followers_master?.branches || {};
-        currentBranches.forEach(b => {
-          b.summary = b.summary || {};
-          if (fm[b.branch] && fm[b.branch].followers) {
-            b.summary.followers = fm[b.branch].followers;
-          }
-        });
-
-        updateSummaryStats();
-        renderTable();
       } catch (e) {
-        console.error('Failed to load dashboard data:', e);
+        // Fallback for GitHub Pages static hosting
+        try {
+          const resStatic = await fetch(`./data/${month}/dashboard.json`);
+          if (!resStatic.ok) throw new Error('Static data fetch failed');
+          globalData = await resStatic.json();
+        } catch (err) {
+          console.error('Failed to load static dashboard:', err);
+          return;
+        }
       }
+
+      currentBranches = globalData.branches || [];
+
+      // Merge followers_master into branch summaries
+      const fm = globalData.followers_master?.branches || {};
+      currentBranches.forEach(b => {
+        b.summary = b.summary || {};
+        if (fm[b.branch] && fm[b.branch].followers) {
+          b.summary.followers = fm[b.branch].followers;
+        }
+      });
+
+      updateSummaryStats();
+      renderTable();
     }
 
     function updateSummaryStats() {
