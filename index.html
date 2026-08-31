@@ -1,0 +1,2103 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Instagram Branch Analytics Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-body: #f8fafc;
+      --bg-surface: #ffffff;
+      --bg-sidebar: #ffffff;
+      --bg-hover: #f1f5f9;
+      --border-color: #e2e8f0;
+      --border-dark: #cbd5e1;
+      
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --text-light: #94a3b8;
+      
+      --primary: #00c288;
+      --primary-hover: #00a876;
+      --primary-light: #e8f8f5;
+      --primary-border: #a7f3d0;
+      
+      --accent-blue: #3b82f6;
+      --accent-blue-light: #eff6ff;
+      --accent-purple: #8b5cf6;
+      --accent-purple-light: #f5f3ff;
+      --accent-amber: #f59e0b;
+      --accent-amber-light: #fffbeb;
+      
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.07), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.08), 0 4px 6px -4px rgb(0 0 0 / 0.04);
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --radius-xl: 18px;
+    }
+
+    [data-theme="dark"] {
+      --bg-body: #0b0f19;
+      --bg-surface: #111827;
+      --bg-sidebar: #111827;
+      --bg-hover: #1f2937;
+      --border-color: #1f2937;
+      --border-dark: #374151;
+      
+      --text-main: #f9fafb;
+      --text-muted: #9ca3af;
+      --text-light: #6b7280;
+      
+      --primary: #00c288;
+      --primary-hover: #059669;
+      --primary-light: rgba(0, 194, 136, 0.15);
+      --primary-border: #064e3b;
+      
+      --accent-blue-light: rgba(59, 130, 246, 0.15);
+      --accent-purple-light: rgba(139, 92, 246, 0.15);
+      --accent-amber-light: rgba(245, 158, 11, 0.15);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+
+    body {
+      background-color: var(--bg-body);
+      color: var(--text-main);
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* Sidebar Layout */
+    aside {
+      width: 260px;
+      background: var(--bg-sidebar);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: column;
+      position: fixed;
+      top: 0;
+      bottom: 0;
+      left: 0;
+      z-index: 40;
+      transition: transform 0.3s ease;
+    }
+
+    .brand-header {
+      height: 64px;
+      padding: 0 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .brand-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--text-main);
+      font-weight: 800;
+      font-size: 1.1rem;
+      letter-spacing: -0.5px;
+    }
+
+    .brand-logo-icon {
+      width: 32px;
+      height: 32px;
+      background: var(--primary);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: white;
+      font-weight: 900;
+    }
+
+    .sidebar-menu {
+      padding: 20px 12px;
+      flex: 1;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .menu-heading {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+      color: var(--text-light);
+      padding: 12px 12px 6px;
+    }
+
+    .menu-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 14px;
+      border-radius: var(--radius-md);
+      color: var(--text-muted);
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      transition: all 0.2s ease;
+      cursor: pointer;
+    }
+
+    .menu-item:hover {
+      background: var(--bg-hover);
+      color: var(--text-main);
+    }
+
+    .menu-item.active {
+      background: var(--primary-light);
+      color: var(--primary);
+    }
+
+    .menu-item-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .menu-icon {
+      width: 18px;
+      height: 18px;
+      stroke-width: 2;
+    }
+
+    .badge-count {
+      background: var(--border-color);
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
+
+    .menu-item.active .badge-count {
+      background: var(--primary);
+      color: white;
+    }
+
+    .sidebar-footer-card {
+      margin: 16px 12px 20px;
+      padding: 16px;
+      background: var(--primary-light);
+      border: 1px solid var(--primary-border);
+      border-radius: var(--radius-lg);
+    }
+
+    .sidebar-footer-title {
+      font-weight: 700;
+      font-size: 0.85rem;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+
+    .sidebar-footer-desc {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      margin-bottom: 12px;
+      line-height: 1.4;
+    }
+
+    .btn-action-sm {
+      display: inline-block;
+      width: 100%;
+      text-align: center;
+      padding: 8px 12px;
+      background: var(--primary);
+      color: white;
+      font-weight: 700;
+      font-size: 0.8rem;
+      border-radius: var(--radius-sm);
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      transition: background 0.2s;
+    }
+
+    .btn-action-sm:hover {
+      background: var(--primary-hover);
+    }
+
+    /* Main Container */
+    main {
+      margin-left: 260px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+    }
+
+    /* Top Bar Header */
+    header {
+      height: 64px;
+      background: var(--bg-surface);
+      border-bottom: 1px solid var(--border-color);
+      padding: 0 28px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 30;
+    }
+
+    .header-title-group {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .page-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .month-selector {
+      background: var(--bg-body);
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 6px 12px;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      outline: none;
+    }
+
+    .header-controls {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .icon-btn {
+      width: 38px;
+      height: 38px;
+      border-radius: var(--radius-md);
+      border: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      position: relative;
+      transition: all 0.2s;
+    }
+
+    .icon-btn:hover {
+      background: var(--bg-hover);
+      color: var(--text-main);
+    }
+
+    .notification-dot {
+      position: absolute;
+      top: 6px;
+      right: 6px;
+      width: 8px;
+      height: 8px;
+      background: #ef4444;
+      border-radius: 50%;
+      border: 2px solid var(--bg-surface);
+    }
+
+    .user-profile-btn {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 5px 12px 5px 6px;
+      border-radius: 999px;
+      border: 1px solid var(--border-color);
+      background: var(--bg-surface);
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .user-profile-btn:hover {
+      background: var(--bg-hover);
+    }
+
+    .avatar {
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: var(--primary);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 0.8rem;
+    }
+
+    .user-name {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    /* Content Area */
+    .content-container {
+      padding: 24px 28px 40px;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    /* System Alert Banner */
+    .alert-banner {
+      background: #fffbe6;
+      border: 1px solid #ffe58f;
+      color: #d48806;
+      padding: 10px 16px;
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    [data-theme="dark"] .alert-banner {
+      background: rgba(245, 158, 11, 0.15);
+      border-color: rgba(245, 158, 11, 0.3);
+      color: #fbbf24;
+    }
+
+    /* Top Hero Card (Webshare Style Banner) */
+    .hero-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      padding: 24px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .hero-top {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .hero-status-group {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .hero-title {
+      font-size: 1.15rem;
+      font-weight: 800;
+    }
+
+    .status-badge {
+      background: #d1fae5;
+      color: #065f46;
+      padding: 3px 10px;
+      border-radius: 999px;
+      font-size: 0.725rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .hero-metrics-list {
+      display: flex;
+      align-items: center;
+      gap: 24px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .hero-metric-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .check-icon {
+      color: var(--primary);
+      font-weight: 900;
+    }
+
+    .hero-callout-box {
+      background: var(--primary-light);
+      border: 1px solid var(--primary-border);
+      border-radius: var(--radius-lg);
+      padding: 18px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .callout-text-title {
+      font-weight: 800;
+      font-size: 1.05rem;
+      color: var(--text-main);
+      margin-bottom: 4px;
+    }
+
+    .callout-text-sub {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+      padding: 10px 20px;
+      border-radius: var(--radius-md);
+      font-weight: 700;
+      font-size: 0.875rem;
+      border: none;
+      cursor: pointer;
+      transition: background 0.2s;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .btn-primary:hover {
+      background: var(--primary-hover);
+    }
+
+    /* Grid Section: Cards (Most Popular Plans Style) */
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 4px;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 20px;
+    }
+
+    .metric-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 16px;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .metric-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+    }
+
+    .card-header-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .card-icon-box {
+      width: 42px;
+      height: 42px;
+      border-radius: var(--radius-md);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    .icon-box-green { background: var(--primary-light); color: var(--primary); }
+    .icon-box-blue { background: var(--accent-blue-light); color: var(--accent-blue); }
+    .icon-box-purple { background: var(--accent-purple-light); color: var(--accent-purple); }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .card-body-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 0.85rem;
+      color: var(--text-muted);
+    }
+
+    .card-bullet-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .bullet-dot {
+      width: 6px;
+      height: 6px;
+      background: var(--primary);
+      border-radius: 50%;
+    }
+
+    .card-footer-row {
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      border-top: 1px solid var(--border-color);
+      padding-top: 14px;
+    }
+
+    .card-big-stat {
+      font-size: 1.4rem;
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .card-big-sub {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .btn-outline-sm {
+      background: transparent;
+      border: 1px solid var(--border-color);
+      color: var(--text-main);
+      padding: 6px 14px;
+      border-radius: var(--radius-md);
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-outline-sm:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    /* Popular Guides / Category Selector Grid (Webshare Icons Style) */
+    .quick-selector-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+      gap: 12px;
+    }
+
+    .selector-item {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-lg);
+      padding: 14px 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      color: var(--text-main);
+    }
+
+    .selector-item:hover, .selector-item.active {
+      border-color: var(--primary);
+      background: var(--primary-light);
+    }
+
+    .selector-icon-svg {
+      width: 24px;
+      height: 24px;
+      color: var(--primary);
+    }
+
+    .selector-name {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    /* Table Section (Webshare AI Agent Style) */
+    .table-container-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      padding: 20px;
+      box-shadow: var(--shadow-sm);
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .table-controls-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .search-box {
+      position: relative;
+      flex: 1;
+      min-width: 240px;
+      max-width: 400px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 8px 12px 8px 36px;
+      background: var(--bg-body);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-md);
+      font-size: 0.85rem;
+      color: var(--text-main);
+      outline: none;
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-light);
+    }
+
+    /* Modern Table */
+    .data-table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      text-align: left;
+      font-size: 0.875rem;
+    }
+
+    th {
+      background: var(--bg-body);
+      padding: 12px 16px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border-color);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    th:hover {
+      color: var(--text-main);
+    }
+
+    td {
+      padding: 14px 16px;
+      border-bottom: 1px solid var(--border-color);
+      color: var(--text-main);
+      font-weight: 500;
+    }
+
+    tr:hover td {
+      background: var(--bg-hover);
+    }
+
+    .branch-cell {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .branch-avatar {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      background: var(--primary-light);
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      font-size: 0.85rem;
+    }
+
+    .branch-name-text {
+      font-weight: 700;
+      color: var(--text-main);
+      text-decoration: none;
+    }
+    .branch-name-text:hover {
+      color: var(--primary);
+    }
+
+    .tag-pill {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: var(--radius-sm);
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: var(--bg-body);
+      border: 1px solid var(--border-color);
+    }
+
+    /* Modal for Post Details */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(4px);
+      z-index: 100;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .modal-overlay.open {
+      display: flex;
+    }
+
+    .modal-card {
+      background: var(--bg-surface);
+      border: 1px solid var(--border-color);
+      border-radius: var(--radius-xl);
+      width: 100%;
+      max-width: 900px;
+      max-height: 85vh;
+      display: flex;
+      flex-direction: column;
+      box-shadow: var(--shadow-lg);
+      overflow: hidden;
+    }
+
+    .modal-header {
+      padding: 16px 24px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .modal-body {
+      padding: 0;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Instagram Profile Modal Header (Mimic Real IG Profile Page) */
+    .ig-profile-header {
+      display: flex;
+      gap: 32px;
+      align-items: flex-start;
+      padding: 28px 32px;
+      border-bottom: 1px solid var(--border-color);
+      background: var(--bg-surface);
+    }
+
+    .ig-avatar-wrapper {
+      position: relative;
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      padding: 3px;
+      background: linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888);
+      flex-shrink: 0;
+    }
+
+    .ig-avatar-img {
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid var(--bg-surface);
+      background: var(--bg-body);
+    }
+
+    .ig-profile-info {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      flex-grow: 1;
+    }
+
+    .ig-username-row {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .ig-username {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    .ig-verified-icon {
+      color: #3897f0;
+      font-size: 1.1rem;
+    }
+
+    .ig-stats-row {
+      display: flex;
+      gap: 32px;
+      font-size: 0.95rem;
+      color: var(--text-main);
+    }
+
+    .ig-stat-item {
+      display: flex;
+      gap: 5px;
+    }
+
+    .ig-stat-num {
+      font-weight: 800;
+      color: var(--text-main);
+    }
+
+    .ig-bio-section {
+      font-size: 0.875rem;
+      line-height: 1.5;
+      color: var(--text-main);
+    }
+
+    .ig-full-name {
+      font-weight: 800;
+      color: var(--text-main);
+      display: block;
+    }
+
+    .ig-category {
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      font-weight: 600;
+      margin-top: 2px;
+    }
+
+    .ig-bio-text {
+      white-space: pre-line;
+      margin-top: 6px;
+      color: var(--text-main);
+    }
+
+    .ig-bio-link {
+      color: #0095f6;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 6px;
+    }
+
+    .ig-bio-link:hover {
+      text-decoration: underline;
+    }
+
+    /* IG Profile Tabs Bar */
+    .ig-tabs-bar {
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      border-bottom: 1px solid var(--border-color);
+      background: var(--bg-surface);
+    }
+
+    .ig-tab-item {
+      padding: 14px 20px;
+      font-size: 0.775rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      cursor: pointer;
+      border-top: 2px solid transparent;
+      margin-top: -1px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-transform: uppercase;
+      transition: color 0.2s;
+    }
+
+    .ig-tab-item.active {
+      color: var(--text-main);
+      border-top-color: var(--text-main);
+    }
+
+    /* IG Square 1:1 Aspect Ratio Grid */
+    .ig-grid-container {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      padding: 24px;
+    }
+
+    @media (max-width: 640px) {
+      .ig-grid-container {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        padding: 12px;
+      }
+      .ig-profile-header {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+      }
+    }
+
+    .ig-grid-item {
+      position: relative;
+      aspect-ratio: 1 / 1;
+      background: #000;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .ig-grid-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      transition: transform 0.3s ease;
+    }
+
+    .ig-grid-item:hover .ig-grid-img {
+      transform: scale(1.04);
+    }
+
+    .ig-grid-overlay {
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.45);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 20px;
+      color: white;
+      font-weight: 800;
+      font-size: 0.95rem;
+      opacity: 0;
+      transition: opacity 0.2s ease;
+    }
+
+    .ig-grid-item:hover .ig-grid-overlay {
+      opacity: 1;
+    }
+
+    .ig-type-badge {
+      position: absolute;
+      top: 8px; right: 8px;
+      background: rgba(0, 0, 0, 0.65);
+      color: white;
+      padding: 3px 7px;
+      border-radius: 4px;
+      font-size: 0.725rem;
+      font-weight: 700;
+      backdrop-filter: blur(4px);
+    }
+
+    /* Instagram Post Lightbox Modal (IG Web Viewer Style) */
+    .ig-lightbox-container {
+      display: flex;
+      width: 100%;
+      height: 100%;
+      background: var(--bg-surface);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+    }
+
+    .ig-lightbox-left {
+      flex: 1.2;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .ig-lightbox-media {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+    }
+
+    .ig-lightbox-right {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      border-left: 1px solid var(--border-color);
+      background: var(--bg-surface);
+    }
+
+    .ig-lightbox-header {
+      padding: 16px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .ig-lightbox-author {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .ig-lightbox-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .ig-lightbox-caption-scroll {
+      flex: 1;
+      padding: 16px;
+      overflow-y: auto;
+      font-size: 0.875rem;
+      line-height: 1.5;
+      color: var(--text-main);
+      white-space: pre-wrap;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .ig-lightbox-footer {
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      background: var(--bg-surface);
+    }
+
+    .ig-lightbox-stats {
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      font-size: 0.875rem;
+      font-weight: 700;
+      color: var(--text-main);
+    }
+
+    @media (max-width: 768px) {
+      .ig-lightbox-container {
+        flex-direction: column;
+        overflow-y: auto;
+      }
+      .ig-lightbox-left {
+        height: 300px;
+      }
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      aside { transform: translateX(-100%); }
+      main { margin-left: 0; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar (Webshare Navigation Style) -->
+  <aside>
+    <div class="brand-header">
+      <a href="#" class="brand-logo">
+        <div class="brand-logo-icon">IG</div>
+        <span>ANALYTICS</span>
+      </a>
+      <span style="font-size:0.8rem; color:var(--text-light); cursor:pointer;">«</span>
+    </div>
+
+    <div class="sidebar-menu">
+      <a href="javascript:void(0)" class="menu-item active" onclick="showDashboardView(event)">
+        <div class="menu-item-left">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          <span>Dashboard</span>
+        </div>
+      </a>
+
+      <div class="menu-heading">KATEGORI CABANG</div>
+      
+      <a href="javascript:void(0)" class="menu-item" onclick="filterCategory('makassar', this)">
+        <div class="menu-item-left">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+          <span>Makassar</span>
+        </div>
+      </a>
+
+      <a href="javascript:void(0)" class="menu-item" onclick="filterCategory('sulawesi', this)">
+        <div class="menu-item-left">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+          <span>Sulawesi</span>
+        </div>
+      </a>
+
+      <a href="javascript:void(0)" class="menu-item" onclick="filterCategory('maluku', this)">
+        <div class="menu-item-left">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line></svg>
+          <span>Maluku & Papua</span>
+        </div>
+      </a>
+
+      <div class="menu-heading">ANALYTICS & EXPORT</div>
+
+      <a href="./top-performers.html" class="menu-item">
+        <div class="menu-item-left">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          <span>Top Performers</span>
+        </div>
+      </a>
+
+      <a href="./data/2026-08/summary.csv" class="menu-item" download>
+        <div class="menu-item-left">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          <span>Export Summary CSV</span>
+        </div>
+      </a>
+    </div>
+
+    <!-- Sidebar Bottom Card (Webshare Style) -->
+    <div class="sidebar-footer-card">
+      <div class="sidebar-footer-title">⚡ Scraper Status</div>
+      <div class="sidebar-footer-desc">28 Cabang Instagram aktif teragregasi. Lengkap 100% tanpa potongan date filter.</div>
+      <button class="btn-action-sm" onclick="location.reload()">Refresh Dataset</button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main>
+    <!-- Top Header -->
+    <header>
+      <div class="header-title-group">
+        <h1 class="page-title">Dashboard Analytics Cabang</h1>
+        <select class="month-selector" id="monthSelect" onchange="loadDashboard(this.value)">
+          <option value="2026-08">Bulan: Agustus 2026</option>
+        </select>
+      </div>
+
+      <div class="header-controls">
+        <button class="icon-btn" id="themeToggleBtn" title="Toggle Light/Dark Theme" onclick="toggleTheme()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+        </button>
+
+        <button class="icon-btn" title="Notifications">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.73 21a2 2 0 0 1-3.46 0"></path></svg>
+          <div class="notification-dot"></div>
+        </button>
+
+        <div class="user-profile-btn">
+          <div class="avatar">EA</div>
+          <span class="user-name">Admin EA</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content Container -->
+    <div class="content-container">
+
+      <!-- Alert Banner -->
+      <div class="alert-banner">
+        <span>⚡ <strong>Sistem Scraper Aktif:</strong> Seluruh 28 Cabang Instagram English Academy berhasil discrape lengkap (1.111 Konten Murni Terdata).</span>
+        <span style="cursor:pointer;" onclick="this.parentElement.style.display='none'">✕</span>
+      </div>
+
+      <!-- Collaboration Notice Banner -->
+      <div style="background:var(--primary-light); border:1px solid rgba(0,149,246,0.3); border-radius:var(--radius-md); padding:12px 16px; display:flex; align-items:center; justify-content:space-between; gap:12px; font-size:0.825rem; color:var(--text-main);">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.1rem;">ℹ️</span>
+          <span><strong>Catatan Konten Kolaborasi:</strong> Karena Cabang 1 s/d 10 (MKS Cendrawasih s/d Tolitoli) terlanjur discrape sebelum update parser, data kolaborasi tidak tersedia di 10 cabang tersebut. Fitur deteksi konten kolaborasi aktif penuh mulai <strong>Cabang 11 (Kendari) s/d Cabang 28 (Sidrap)</strong>.</span>
+        </div>
+        <span style="cursor:pointer; font-weight:700; opacity:0.6;" onclick="this.parentElement.style.display='none'">✕</span>
+      </div>
+
+      <div id="dashboardView" style="display:flex; flex-direction:column; gap:24px;">
+
+      <!-- Hero Banner Card (Webshare Style) -->
+      <div class="hero-card">
+        <div class="hero-top">
+          <div>
+            <div class="hero-title">Rangkuman Engagement Cabang</div>
+            <div class="hero-metrics-list" style="margin-top:6px;">
+              <span class="hero-metric-item"><span class="check-icon">✓</span> <span id="heroBranchesCount">28</span> Cabang Terdata</span>
+              <span class="hero-metric-item"><span class="check-icon">✓</span> <span id="heroPostsCount">603</span> Total Postingan</span>
+              <span class="hero-metric-item"><span class="check-icon">✓</span> <span id="heroViewsCount">0</span> Total Views</span>
+            </div>
+          </div>
+          <div class="hero-status-group">
+            <span class="status-badge">Data Aktif</span>
+          </div>
+        </div>
+
+        <div class="hero-callout-box">
+          <div>
+            <div class="callout-text-title">🎉 Scrape Agustus 2026 Lengkap!</div>
+            <div class="callout-text-sub">Seluruh postingan dan reels dari 28 cabang terkumpul tanpa ada potongan tanggal.</div>
+          </div>
+          <button class="btn-primary" onclick="scrollToTable()">
+            <span>Lihat Seluruh Cabang</span>
+            <span>→</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Key Analytics Grid Cards (Most Popular Plans Style) -->
+      <div class="section-header">
+        <div class="section-title">Cabang Performa Tertinggi</div>
+      </div>
+
+      <div class="cards-grid">
+        <!-- Top Engagement Card -->
+        <div class="metric-card">
+          <div>
+            <div class="card-header-row">
+              <div class="card-icon-box icon-box-purple">
+                <svg style="width:20px; height:20px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>
+              </div>
+              <div>
+                <div class="card-title" id="topLikesBranchName">MKS Cendrawasih</div>
+                <div style="font-size:0.75rem; font-weight:700; color:var(--primary);">Likes Terbanyak</div>
+              </div>
+            </div>
+            <div class="card-body-list" style="margin-top:16px;">
+              <div class="card-bullet-item"><div class="bullet-dot"></div> <strong id="topLikesCount" style="color:var(--text-main);">2.4K</strong> Total Likes</div>
+              <div class="card-bullet-item"><div class="bullet-dot"></div> <strong id="topCommentsCount" style="color:var(--text-main);">183</strong> Total Komentar</div>
+              <div class="card-bullet-item"><div class="bullet-dot"></div> <strong id="topLikesPostsCount" style="color:var(--text-main);">53</strong> Total Postingan</div>
+            </div>
+          </div>
+          <div class="card-footer-row">
+            <div>
+              <div class="card-big-stat" id="topLikesBigStat">2,422</div>
+              <div class="card-big-sub">Total Likes</div>
+            </div>
+            <button class="btn-outline-sm" id="topLikesBtn" onclick="openBranchModal('MKS Cendrawasih')">Detail</button>
+          </div>
+        </div>
+
+        <!-- Top Views / Top Reels Card -->
+        <div class="metric-card">
+          <div>
+            <div class="card-header-row">
+              <div class="card-icon-box icon-box-blue">
+                <svg style="width:20px; height:20px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg>
+              </div>
+              <div>
+                <div class="card-title" id="topViewsBranchName">Sedang mengumpulkan data...</div>
+                <div style="font-size:0.75rem; font-weight:700; color:#0284c7;" id="topViewsCardSub">Views Terbanyak</div>
+              </div>
+            </div>
+            <div class="card-body-list" style="margin-top:16px;">
+              <div class="card-bullet-item"><div class="bullet-dot"></div> <strong id="topViewsCount" style="color:var(--text-main);">-</strong> <span id="topViewsBullet1Label">Total Video Views</span></div>
+              <div class="card-bullet-item"><div class="bullet-dot"></div> <strong id="topViewsReelsCount" style="color:var(--text-main);">-</strong> <span id="topViewsBullet2Label">Total Reels Video</span></div>
+              <div class="card-bullet-item"><div class="bullet-dot"></div> <strong id="topViewsAvg" style="color:var(--text-main);">-</strong> <span id="topViewsBullet3Label">Rata-Rata Views / Reel</span></div>
+            </div>
+          </div>
+          <div class="card-footer-row">
+            <div>
+              <div class="card-big-stat" id="topViewsBigStat">-</div>
+              <div class="card-big-sub" id="topViewsBigSub">Sedang mengumpulkan data...</div>
+            </div>
+            <button class="btn-outline-sm" id="topViewsBtn" style="display:none;">Detail</button>
+          </div>
+        </div>
+
+        <!-- Top Followers Card -->
+        <div class="metric-card">
+          <div>
+            <div class="card-header-row">
+              <div class="card-icon-box icon-box-green">
+                <svg style="width:20px; height:20px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+              </div>
+              <div>
+                <div class="card-title" id="topFollowersBranchName">MKS Cendrawasih</div>
+                <div style="font-size:0.75rem; font-weight:700; color:#059669;">Followers Terbanyak</div>
+              </div>
+            </div>
+            <div class="card-body-list" style="margin-top:16px;">
+              <div class="card-bullet-item"><div class="bullet-dot"></div> <strong id="topFollowersCount" style="color:var(--text-main);">3.943</strong> Total Pengikut</div>
+              <div class="card-bullet-item"><div class="bullet-dot"></div> Status: Akun Bisnis Aktif</div>
+              <div class="card-bullet-item"><div class="bullet-dot"></div> Kategori: Education / Kursus</div>
+            </div>
+          </div>
+          <div class="card-footer-row">
+            <div>
+              <div class="card-big-stat" id="topFollowersBigStat">3,943</div>
+              <div class="card-big-sub">Pengikut (Followers)</div>
+            </div>
+            <button class="btn-outline-sm" id="topFollowersBtn" onclick="openBranchModal('MKS Cendrawasih')">Detail</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Branch Category Selectors (Webshare Setup Guides Style) -->
+      <div class="section-header">
+        <div class="section-title">Pilih Wilayah Cabang</div>
+      </div>
+
+      <div class="quick-selector-grid">
+        <div class="selector-item active" onclick="filterCategory('all', this)">
+          <svg class="selector-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          <div class="selector-name">Semua (28)</div>
+        </div>
+        <div class="selector-item" onclick="filterCategory('makassar', this)">
+          <svg class="selector-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+          <div class="selector-name">Makassar</div>
+        </div>
+        <div class="selector-item" onclick="filterCategory('sulsel', this)">
+          <svg class="selector-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 19 21 12 17 5 21 12 2"></polygon></svg>
+          <div class="selector-name">Sulsel</div>
+        </div>
+        <div class="selector-item" onclick="filterCategory('sulteng', this)">
+          <svg class="selector-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-2 6-2 6 2 6 2 3-2 6-2 6 2"></path><path d="M2 17s3-2 6-2 6 2 6 2 3-2 6-2 6 2 6 2"></path></svg>
+          <div class="selector-name">Sulteng & Sulbar</div>
+        </div>
+        <div class="selector-item" onclick="filterCategory('sulut', this)">
+          <svg class="selector-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m8 3 4 8 5-5 5 15H2L8 3z"></path></svg>
+          <div class="selector-name">Sulut & Gorontalo</div>
+        </div>
+        <div class="selector-item" onclick="filterCategory('maluku', this)">
+          <svg class="selector-icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>
+          <div class="selector-name">Maluku & Papua</div>
+        </div>
+      </div>
+
+      <!-- Main Data Table Section (Webshare AI Agent Style) -->
+      <div class="table-container-card" id="tableCard">
+        <div class="table-controls-row">
+          <div class="section-title">Tabel Kinerja Cabang</div>
+          <div class="search-box">
+            <svg class="search-icon" style="width:16px; height:16px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="searchInput" class="search-input" placeholder="Cari nama cabang..." oninput="onSearchInput(this.value)">
+          </div>
+        </div>
+
+        <div class="data-table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th onclick="sortTable('branch')">Cabang ↕</th>
+                <th onclick="sortTable('total_items')">Total Konten ↕</th>
+                <th onclick="sortTable('total_reels')">Reels (Video) ↕</th>
+                <th onclick="sortTable('total_posts')">Foto (Feeds) ↕</th>
+                <th onclick="sortTable('total_views')">Total Views ↕</th>
+                <th onclick="sortTable('total_likes')">Total Likes ↕</th>
+                <th onclick="sortTable('total_comments')">Comments ↕</th>
+                <th onclick="sortTable('followers')">Followers ↕</th>
+                <th style="text-align:right;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="tableBody">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- End dashboardView -->
+
+      <!-- Top Performers Leaderboard Page View -->
+      <div id="topPerformersView" style="display:none; flex-direction:column; gap:20px;">
+        <div class="hero-card" style="background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(0,149,246,0.1)); border-color: rgba(124,58,237,0.3);">
+          <div class="hero-top">
+            <div>
+              <div class="hero-title" style="display:flex; align-items:center; gap:10px;">
+                <svg style="width:24px; height:24px; color:#8b5cf6;" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+                Top Performing Content Leaderboard
+              </div>
+              <div style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">
+                Peringkat postingan & Reels terbaik dengan engagement Likes, Komentar, dan Views paling tinggi dari seluruh 28 cabang.
+              </div>
+            </div>
+            <button class="btn-outline-sm" onclick="showDashboardView()">← Kembali ke Dashboard</button>
+          </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="table-container-card" style="padding:14px 20px;">
+          <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+            <div class="ig-tabs-bar" style="border:none; margin:0; padding:0;">
+              <div class="ig-tab-item active" onclick="filterTopPerformers('all', this)">🔥 SEMUA KONTEN</div>
+              <div class="ig-tab-item" onclick="filterTopPerformers('reels', this)">🎬 TOP REELS</div>
+              <div class="ig-tab-item" onclick="filterTopPerformers('posts', this)">🖼️ TOP FOTO</div>
+            </div>
+
+            <div style="display:flex; align-items:center; gap:10px;">
+              <select class="month-selector" id="topSortSelect" onchange="renderTopPerformersTable()" style="padding:6px 12px; font-size:0.8rem;">
+                <option value="likes">Urutkan: Likes Terbanyak ❤️</option>
+                <option value="comments">Urutkan: Komentar Terbanyak 💬</option>
+                <option value="views">Urutkan: Views Terbanyak 👁️</option>
+                <option value="date">Urutkan: Terbaru 📅</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Leaderboard Table -->
+        <div class="table-container-card">
+          <div class="data-table-wrapper">
+            <table>
+              <thead>
+                <tr>
+                  <th style="width:60px; text-align:center;">Peringkat</th>
+                  <th>Cabang & Konten</th>
+                  <th>Tipe</th>
+                  <th>Likes ❤️</th>
+                  <th>Komentar 💬</th>
+                  <th>Views 👁️</th>
+                  <th>Tanggal</th>
+                  <th style="text-align:right;">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="topPerformersTbody">
+                <!-- Rendered dynamically -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+  </main>
+
+  <!-- Post Details Modal (Mimic Instagram Profile Page UI) -->
+  <div class="modal-overlay" id="postModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <div style="display:flex; align-items:center; gap:10px;">
+          <svg style="width:20px; height:20px; color:var(--text-main);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+          <h2 style="font-size:1.05rem; font-weight:800;" id="modalBranchTitle">Instagram Profile Preview</h2>
+        </div>
+        <button class="icon-btn" onclick="closeModal()">✕</button>
+      </div>
+      <div class="modal-body" id="modalBodyContainer">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Instagram Post Lightbox Modal -->
+  <div class="modal-overlay" id="postDetailModal" style="z-index: 120;">
+    <div class="modal-card" style="max-width: 950px; height: 600px; max-height: 90vh;">
+      <div class="ig-lightbox-container" id="postDetailContainer">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let globalData = null;
+    let currentBranches = [];
+    let sortColumn = 'total_likes';
+    let sortAsc = false;
+    let currentCategory = 'all';
+    let activeModalBranch = null;
+    let activeModalTab = 'all';
+    let modalSortKey = 'likes';
+    let topPerformersFilter = 'all';
+
+    async function init() {
+      // Load Theme
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+
+      try {
+        const resMonths = await fetch('/api/months');
+        const months = await resMonths.json();
+        const monthSelect = document.getElementById('monthSelect');
+        if (months.length > 0) {
+          monthSelect.innerHTML = months.map(m => `<option value="${m}">Bulan: ${m}</option>`).join('');
+        }
+        await loadDashboard(monthSelect.value || '2026-08');
+      } catch (e) {
+        console.error('Failed to init dashboard:', e);
+      }
+    }
+
+    async function loadDashboard(month) {
+      try {
+        const res = await fetch(`/api/dashboard?month=${month}`);
+        globalData = await res.json();
+        currentBranches = globalData.branches || [];
+
+        // Merge followers_master into branch summaries
+        const fm = globalData.followers_master?.branches || {};
+        currentBranches.forEach(b => {
+          b.summary = b.summary || {};
+          if (fm[b.branch] && fm[b.branch].followers) {
+            b.summary.followers = fm[b.branch].followers;
+          }
+        });
+
+        updateSummaryStats();
+        renderTable();
+      } catch (e) {
+        console.error('Failed to load dashboard data:', e);
+      }
+    }
+
+    function updateSummaryStats() {
+      if (!currentBranches.length) return;
+
+      const totalBranches = currentBranches.length;
+      let totalPosts = 0;
+      let totalReels = 0;
+      let totalFeeds = 0;
+      let totalViews = 0;
+      let totalLikes = 0;
+      let totalComments = 0;
+
+      let topLikesB = currentBranches[0];
+      let topViewsB = currentBranches[0];
+      let topReelsB = currentBranches[0];
+      let topFollowersB = currentBranches[0];
+
+      currentBranches.forEach(b => {
+        const sum = b.summary || {};
+        totalPosts += (sum.total || b.posts?.length || 0);
+        totalReels += (sum.total_reels || 0);
+        totalFeeds += (sum.total_posts || 0);
+        totalViews += (sum.total_views || 0);
+        totalLikes += (sum.total_likes || 0);
+        totalComments += (sum.total_comments || 0);
+
+        if ((sum.total_likes || 0) > (topLikesB.summary?.total_likes || 0)) topLikesB = b;
+        if ((sum.total_views || 0) > (topViewsB.summary?.total_views || 0)) topViewsB = b;
+        if ((sum.total_reels || 0) > (topReelsB.summary?.total_reels || 0)) topReelsB = b;
+        if ((sum.followers || 0) > (topFollowersB.summary?.followers || 0)) topFollowersB = b;
+      });
+
+      const heroMetricsContainer = document.querySelector('.hero-metrics-list');
+      if (heroMetricsContainer) {
+        heroMetricsContainer.innerHTML = `
+          <span class="hero-metric-item"><span class="check-icon">✓</span> <span>${totalBranches}</span> Cabang Terdata</span>
+          <span class="hero-metric-item"><span class="check-icon">✓</span> <span>${totalPosts.toLocaleString('id-ID')}</span> Total Konten (${totalReels} Reels, ${totalFeeds} Foto)</span>
+          <span class="hero-metric-item"><span class="check-icon">✓</span> <span style="color:var(--primary); font-weight:800;">${totalLikes.toLocaleString('id-ID')}</span> Total Likes</span>
+          <span class="hero-metric-item"><span class="check-icon">✓</span> <span>${totalComments.toLocaleString('id-ID')}</span> Komentar</span>
+        `;
+      }
+
+      // Top Likes
+      document.getElementById('topLikesBranchName').innerText = topLikesB.branch;
+      document.getElementById('topLikesCount').innerText = formatCompact(topLikesB.summary?.total_likes || 0);
+      document.getElementById('topCommentsCount').innerText = formatCompact(topLikesB.summary?.total_comments || 0);
+      document.getElementById('topLikesPostsCount').innerText = (topLikesB.posts?.length || 0);
+      document.getElementById('topLikesBigStat').innerText = (topLikesB.summary?.total_likes || 0).toLocaleString('id-ID');
+      document.getElementById('topLikesBtn').setAttribute('onclick', `openBranchModal('${topLikesB.branch.replace(/'/g, "\\'")}')`);
+
+      // Top Views (Views Terbanyak)
+      const labelBullet1 = document.getElementById('topViewsBullet1Label');
+      const labelBullet2 = document.getElementById('topViewsBullet2Label');
+      const labelBullet3 = document.getElementById('topViewsBullet3Label');
+
+      if (totalViews > 0 && topViewsB) {
+        document.getElementById('topViewsBranchName').innerText = topViewsB.branch;
+        document.getElementById('topViewsCardSub').innerText = 'Views Terbanyak';
+        document.getElementById('topViewsCount').innerText = (topViewsB.summary?.total_views || 0).toLocaleString('id-ID');
+        if (labelBullet1) labelBullet1.innerText = 'Total Video Views';
+
+        document.getElementById('topViewsReelsCount').innerText = (topViewsB.summary?.total_reels || 0);
+        if (labelBullet2) labelBullet2.innerText = 'Total Reels Video';
+
+        document.getElementById('topViewsAvg').innerText = (topViewsB.summary?.avg_views_per_reel || 0).toLocaleString('id-ID');
+        if (labelBullet3) labelBullet3.innerText = 'Rata-Rata Views / Reel';
+
+        document.getElementById('topViewsBigStat').innerText = (topViewsB.summary?.total_views || 0).toLocaleString('id-ID');
+        document.getElementById('topViewsBigSub').innerText = 'Total Video Views';
+        document.getElementById('topViewsBtn').setAttribute('onclick', `openBranchModal('${topViewsB.branch.replace(/'/g, "\\'")}')`);
+        document.getElementById('topViewsBtn').style.display = 'inline-flex';
+      } else {
+        document.getElementById('topViewsBranchName').innerText = 'Sedang mengumpulkan data...';
+        document.getElementById('topViewsCardSub').innerText = 'Views Terbanyak';
+        document.getElementById('topViewsCount').innerText = '-';
+        if (labelBullet1) labelBullet1.innerText = 'Total Video Views';
+
+        document.getElementById('topViewsReelsCount').innerText = '-';
+        if (labelBullet2) labelBullet2.innerText = 'Total Reels Video';
+
+        document.getElementById('topViewsAvg').innerText = '-';
+        if (labelBullet3) labelBullet3.innerText = 'Rata-Rata Views / Reel';
+
+        document.getElementById('topViewsBigStat').innerText = '-';
+        document.getElementById('topViewsBigSub').innerText = 'Sedang mengumpulkan data...';
+        document.getElementById('topViewsBtn').style.display = 'none';
+      }
+
+      // Top Followers
+      const topFolCount = topFollowersB.summary?.followers || 0;
+      document.getElementById('topFollowersBranchName').innerText = topFollowersB.branch;
+      document.getElementById('topFollowersCount').innerText = topFolCount ? topFolCount.toLocaleString('id-ID') : '-';
+      document.getElementById('topFollowersBigStat').innerText = topFolCount ? topFolCount.toLocaleString('id-ID') : '-';
+      document.getElementById('topFollowersBtn').setAttribute('onclick', `openBranchModal('${topFollowersB.branch.replace(/'/g, "\\'")}')`);
+    }
+
+    function renderTable() {
+      const tbody = document.getElementById('tableBody');
+      const search = document.getElementById('searchInput').value.toLowerCase();
+
+      let filtered = currentBranches.filter(b => {
+        const name = b.branch.toLowerCase();
+        if (search && !name.includes(search)) return false;
+
+        if (currentCategory === 'makassar') return name.includes('mks') || name.includes('makassar');
+        if (currentCategory === 'sulsel') return name.includes('toraja') || name.includes('palopo') || name.includes('parepare') || name.includes('gowa') || name.includes('bone') || name.includes('bulukumba') || name.includes('pangkep') || name.includes('pinrang') || name.includes('sidrap') || name.includes('soppeng');
+        if (currentCategory === 'sulteng') return name.includes('palu') || name.includes('mamuju') || name.includes('tolitoli') || name.includes('polman');
+        if (currentCategory === 'sulut') return name.includes('kendari') || name.includes('manado') || name.includes('tomohon') || name.includes('bitung') || name.includes('gorontalo') || name.includes('baubau') || name.includes('kolaka');
+        if (currentCategory === 'maluku') return name.includes('ternate') || name.includes('sorong');
+
+        return true;
+      });
+
+      // Sort
+      filtered.sort((a, b) => {
+        let valA = getSortValue(a, sortColumn);
+        let valB = getSortValue(b, sortColumn);
+        if (valA < valB) return sortAsc ? -1 : 1;
+        if (valA > valB) return sortAsc ? 1 : -1;
+        return 0;
+      });
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="9" style="text-align:center; padding:30px; color:var(--text-muted);">Tidak ada data cabang yang cocok.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = filtered.map(b => {
+        const sum = b.summary || {};
+        const initials = b.branch.split(' ').map(w => w[0]).join('').substring(0, 2).toUpperCase();
+        const folText = sum.followers ? sum.followers.toLocaleString('id-ID') : '-';
+        const totalItems = (sum.total_reels || 0) + (sum.total_posts || 0);
+        return `
+          <tr>
+            <td>
+              <div class="branch-cell">
+                <div class="branch-avatar">${initials}</div>
+                <div>
+                  <a href="${b.url}" target="_blank" class="branch-name-text">${b.branch}</a>
+                  <div style="font-size:0.75rem; color:var(--text-light);">${b.posts?.length || 0} konten</div>
+                </div>
+              </div>
+            </td>
+            <td><strong style="color:var(--text-main); font-size:0.95rem;">${totalItems}</strong></td>
+            <td><span class="tag-pill" style="background:#e0f2fe; color:#0369a1; display:inline-flex; align-items:center; gap:4px;"><svg style="width:12px; height:12px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg> ${sum.total_reels || 0} Reels</span></td>
+            <td><span class="tag-pill" style="background:#f3f4f6; color:#6b7280; display:inline-flex; align-items:center; gap:4px;"><svg style="width:12px; height:12px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg> ${sum.total_posts || 0} Foto</span></td>
+            <td><strong>${(sum.total_views || 0).toLocaleString('id-ID')}</strong></td>
+            <td><strong style="color:var(--primary);">${(sum.total_likes || 0).toLocaleString('id-ID')}</strong></td>
+            <td>${(sum.total_comments || 0).toLocaleString('id-ID')}</td>
+            <td>${folText}</td>
+            <td style="text-align:right;">
+              <button class="btn-outline-sm" onclick="openBranchModal('${b.branch}')">Lihat Posts</button>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function getSortValue(b, col) {
+      const sum = b.summary || {};
+      if (col === 'branch') return b.branch.toLowerCase();
+      if (col === 'total_items') return (sum.total_reels || 0) + (sum.total_posts || 0);
+      if (col === 'total_reels') return sum.total_reels || 0;
+      if (col === 'total_posts') return sum.total_posts || 0;
+      if (col === 'total_views') return sum.total_views || 0;
+      if (col === 'total_likes') return sum.total_likes || 0;
+      if (col === 'total_comments') return sum.total_comments || 0;
+      if (col === 'followers') return sum.followers || 0;
+      return 0;
+    }
+
+    function sortTable(col) {
+      if (sortColumn === col) {
+        sortAsc = !sortAsc;
+      } else {
+        sortColumn = col;
+        sortAsc = false;
+      }
+      renderTable();
+    }
+
+    function onSearchInput(val) {
+      renderTable();
+    }
+
+    function filterCategory(cat, el) {
+      currentCategory = cat;
+      showDashboardView();
+      if (el) {
+        document.querySelectorAll('.quick-selector-grid .selector-item').forEach(i => i.classList.remove('active'));
+        document.querySelectorAll('.sidebar-menu .menu-item').forEach(i => i.classList.remove('active'));
+        el.classList.add('active');
+      }
+      renderTable();
+    }
+
+    function openBranchModal(branchName, tab = 'all') {
+      const b = currentBranches.find(item => item.branch === branchName);
+      if (!b) return;
+
+      activeModalBranch = b;
+      activeModalTab = tab;
+
+      const month = document.getElementById('monthSelect').value || '2026-08';
+      const slug = b.branch.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+      const masterInfo = globalData.followers_master?.branches?.[b.branch] || {};
+
+      const handle = masterInfo.username || b.url.match(/instagram\.com\/([^/]+)/)?.[1] || slug;
+      const fullName = masterInfo.full_name || `English Academy ${b.branch}`;
+      const bioText = masterInfo.biography || 'Kursus Bahasa Inggris Tatap Muka & Online Terbaik by Ruangguru.';
+      const category = masterInfo.category || 'Pendidikan / Kursus Bahasa Inggris';
+      const followersCount = (masterInfo.followers || b.summary?.followers || 0).toLocaleString('id-ID');
+      const followingCount = masterInfo.following ? masterInfo.following.toLocaleString('id-ID') : '-';
+      const postsCount = (b.posts?.length || 0).toLocaleString('id-ID');
+
+      const avatarSrc = masterInfo.profile_pic_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(b.branch)}&background=0095f6&color=fff&size=128`;
+      const externalLink = masterInfo.external_url || masterInfo.bio_links?.[0] || null;
+
+      const container = document.getElementById('modalBodyContainer');
+
+      let postsToRender = [...(b.posts || [])];
+      if (tab === 'reels') postsToRender = postsToRender.filter(p => p.type === 'reel/video');
+      if (tab === 'posts') postsToRender = postsToRender.filter(p => p.type !== 'reel/video');
+
+      postsToRender.sort((x, y) => {
+        if (modalSortKey === 'views') return (y.views || 0) - (x.views || 0);
+        if (modalSortKey === 'likes') return (y.likes || 0) - (x.likes || 0);
+        if (modalSortKey === 'comments') return (y.comments || 0) - (x.comments || 0);
+        if (modalSortKey === 'date') return (y.taken_at || 0) - (x.taken_at || 0);
+        return 0;
+      });
+
+      container.innerHTML = `
+        <!-- IG Profile Header -->
+        <div class="ig-profile-header">
+          <div class="ig-avatar-wrapper">
+            <img src="${avatarSrc}" class="ig-avatar-img" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(b.branch)}&background=0D9488&color=fff';" alt="${b.branch}">
+          </div>
+          <div class="ig-profile-info">
+            <div class="ig-username-row">
+              <span class="ig-username">${handle}</span>
+              <svg style="width:18px; height:18px; color:#0095f6; fill:currentColor;" viewBox="0 0 24 24" title="Akun Terverifikasi"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm-1.7 14.3l-3.6-3.6 1.4-1.4 2.2 2.2 6.2-6.2 1.4 1.4-7.6 7.6z"/></svg>
+              <a href="${b.url}" target="_blank" class="btn-primary" style="padding:6px 14px; font-size:0.8rem; text-decoration:none;">Buka di IG ↗</a>
+            </div>
+
+            <div class="ig-stats-row">
+              <div class="ig-stat-item"><span class="ig-stat-num">${postsCount}</span> postingan</div>
+              <div class="ig-stat-item"><span class="ig-stat-num">${followersCount}</span> pengikut</div>
+              <div class="ig-stat-item"><span class="ig-stat-num">${followingCount}</span> diikuti</div>
+            </div>
+
+            <div class="ig-bio-section">
+              <span class="ig-full-name">${fullName}</span>
+              <div class="ig-category">${category}</div>
+              <div class="ig-bio-text">${bioText}</div>
+              ${externalLink ? `<a href="${externalLink}" target="_blank" class="ig-bio-link"><svg style="width:14px; height:14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg> ${externalLink.replace(/^https?:\/\//, '')}</a>` : ''}
+            </div>
+          </div>
+        </div>
+
+        <!-- IG Profile Tabs & Sort Bar -->
+        <div class="ig-tabs-bar" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <div style="display:flex; gap:8px;">
+            <div class="ig-tab-item ${tab === 'all' ? 'active' : ''}" onclick="switchModalTab('all')"><svg style="width:14px; height:14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg> SEMUA KONTEN (${b.posts?.length || 0})</div>
+            <div class="ig-tab-item ${tab === 'reels' ? 'active' : ''}" onclick="switchModalTab('reels')"><svg style="width:14px; height:14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg> REELS (${b.summary?.total_reels || 0})</div>
+            <div class="ig-tab-item ${tab === 'posts' ? 'active' : ''}" onclick="switchModalTab('posts')"><svg style="width:14px; height:14px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg> FOTO (${b.summary?.total_posts || 0})</div>
+          </div>
+
+          <div>
+            <select class="month-selector" id="modalSortSelect" onchange="onModalSortChange(this.value)" style="padding:4px 10px; font-size:0.78rem;">
+              <option value="views" ${modalSortKey === 'views' ? 'selected' : ''}>Urutkan: Views Terbanyak 👁️</option>
+              <option value="likes" ${modalSortKey === 'likes' ? 'selected' : ''}>Urutkan: Likes Terbanyak ❤️</option>
+              <option value="comments" ${modalSortKey === 'comments' ? 'selected' : ''}>Urutkan: Komentar Terbanyak 💬</option>
+              <option value="date" ${modalSortKey === 'date' ? 'selected' : ''}>Urutkan: Terbaru 📅</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- IG Square 1:1 Aspect Ratio Grid -->
+        <div class="ig-grid-container">
+          ${postsToRender.length === 0 ? `
+            <div style="grid-column:1/-1; text-align:center; padding:40px; color:var(--text-muted);">
+              Belum ada postingan untuk kategori ini.
+            </div>
+          ` : postsToRender.map(p => {
+            const thumbLocal = `/data/${month}/thumbs/${slug}/${p.shortcode}.jpg`;
+            const isReel = p.type === 'reel/video';
+            return `
+              <div class="ig-grid-item" title="${p.caption ? p.caption.replace(/"/g, '&quot;') : p.shortcode}" onclick="openPostDetail('${p.shortcode}', '${b.branch.replace(/'/g, "\\'")}')">
+                <img src="${thumbLocal}" class="ig-grid-img" onerror="this.onerror=null; this.src='${p.thumb_url || ''}';" alt="${p.shortcode}">
+                <div class="ig-type-badge">
+                  ${p.type === 'reel/video'
+                    ? '<svg style="width:12px; height:12px; vertical-align:-2px; margin-right:3px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"></polygon><rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect></svg> Reel'
+                    : (p.type === 'carousel'
+                        ? `<svg style="width:12px; height:12px; vertical-align:-2px; margin-right:3px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><circle cx="8.5" cy="8.5" r="1.5"></circle><polyline points="21 15 16 10 5 21"></polyline></svg> Carousel ${p.carousel_count ? `(${p.carousel_count} Slide)` : ''}`
+                        : '<svg style="width:12px; height:12px; vertical-align:-2px; margin-right:3px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg> Foto Single')}
+                </div>
+                <div class="ig-grid-overlay">
+                  <span style="display:inline-flex; align-items:center; gap:4px;"><svg style="width:16px; height:16px; fill:white;" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg> ${(p.likes || 0).toLocaleString('id-ID')}</span>
+                  <span style="display:inline-flex; align-items:center; gap:4px;"><svg style="width:16px; height:16px; fill:white;" viewBox="0 0 24 24"><path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18z"/></svg> ${(p.comments || 0).toLocaleString('id-ID')}</span>
+                  ${isReel ? `<span style="display:inline-flex; align-items:center; gap:4px;"><svg style="width:16px; height:16px; fill:white;" viewBox="0 0 24 24"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg> ${formatCompact(p.views || 0)}</span>` : ''}
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+
+      document.getElementById('postModal').classList.add('open');
+    }
+
+    function switchModalTab(tab) {
+      if (activeModalBranch) {
+        openBranchModal(activeModalBranch.branch, tab);
+      }
+    }
+
+    function onModalSortChange(val) {
+      modalSortKey = val;
+      if (activeModalBranch) {
+        openBranchModal(activeModalBranch.branch, activeModalTab);
+      }
+    }
+
+    function closeModal() {
+      document.getElementById('postModal').classList.remove('open');
+    }
+
+    function openPostDetail(shortcode, branchName) {
+      const b = currentBranches.find(item => item.branch === branchName);
+      if (!b) return;
+
+      const post = b.posts?.find(p => p.shortcode === shortcode);
+      if (!post) return;
+
+      const month = document.getElementById('monthSelect').value || '2026-08';
+      const slug = b.branch.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+      const masterInfo = globalData.followers_master?.branches?.[b.branch] || {};
+
+      const avatarSrc = masterInfo.profile_pic_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(b.branch)}&background=0095f6&color=fff&size=128`;
+      const handle = masterInfo.username || b.url.match(/instagram\.com\/([^/]+)/)?.[1] || slug;
+      const thumbLocal = `/data/${month}/thumbs/${slug}/${post.shortcode}.jpg`;
+      const dateStr = post.taken_at ? new Date((post.taken_at + 8*3600)*1000).toISOString().replace('T', ' ').substring(0, 10) : '-';
+      const captionText = post.caption || 'Tidak ada deskripsi caption.';
+
+      const container = document.getElementById('postDetailContainer');
+      const isReel = post.type === 'reel/video';
+      const typeLabel = isReel ? '🎬 Reel' : (post.type === 'carousel' ? `🖼️ Carousel (${post.carousel_count || ''} Slide)` : '📷 Foto Single');
+
+      const hashtagsHtml = (post.hashtags && post.hashtags.length > 0)
+        ? `<div style="margin-top:10px; display:flex; flex-wrap:wrap; gap:4px;">
+            ${post.hashtags.map(h => `<span style="background:var(--primary-light); color:var(--primary); font-size:0.75rem; padding:2px 8px; border-radius:12px; font-weight:700;">${h}</span>`).join('')}
+           </div>`
+        : '';
+
+      container.innerHTML = `
+        <div class="ig-lightbox-left">
+          <img src="${thumbLocal}" class="ig-lightbox-media" onerror="this.onerror=null; this.src='${post.thumb_url || ''}';" alt="${post.shortcode}">
+          <div class="ig-type-badge" style="top:12px; right:12px;">${typeLabel}</div>
+        </div>
+        <div class="ig-lightbox-right">
+          <div class="ig-lightbox-header">
+            <div class="ig-lightbox-author">
+              <img src="${avatarSrc}" class="ig-lightbox-avatar" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(b.branch)}&background=0D9488&color=fff';" alt="${b.branch}">
+              <div>
+                <div style="font-weight:700; font-size:0.9rem; display:flex; align-items:center; gap:6px;">
+                  <span>${handle}</span>
+                  ${post.is_pinned ? '<span style="background:#fef3c7; color:#d97706; padding:2px 6px; border-radius:10px; font-size:0.68rem; font-weight:700;">📌 Pinned</span>' : ''}
+                </div>
+                <div style="font-size:0.75rem; color:var(--text-muted);">${dateStr}</div>
+              </div>
+            </div>
+            <button class="icon-btn" onclick="closePostDetailModal()">✕</button>
+          </div>
+
+          <div class="ig-lightbox-caption-scroll">
+            <div style="font-weight:700; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+              <span>${handle}</span>
+              ${post.carousel_count ? `<span style="background:#e0e7ff; color:#4338ca; padding:2px 6px; border-radius:10px; font-size:0.68rem; font-weight:700;">${post.carousel_count} Slide</span>` : ''}
+              ${post.video_duration ? `<span style="background:#f3e8ff; color:#6b21a8; padding:2px 6px; border-radius:10px; font-size:0.68rem; font-weight:700;">⏱️ ${Math.round(post.video_duration)}s</span>` : ''}
+            </div>
+            <div>${captionText}</div>
+            ${hashtagsHtml}
+          </div>
+
+          <div class="ig-lightbox-footer">
+            <div class="ig-lightbox-stats">
+              <span style="display:inline-flex; align-items:center; gap:4px;"><svg style="width:18px; height:18px; color:#ef4444; fill:currentColor;" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg> ${(post.likes || 0).toLocaleString('id-ID')} Likes</span>
+              <span style="display:inline-flex; align-items:center; gap:4px;"><svg style="width:18px; height:18px; color:var(--text-main);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18z"/></svg> ${(post.comments || 0).toLocaleString('id-ID')} Komentar</span>
+              ${isReel ? `<span style="display:inline-flex; align-items:center; gap:4px;"><svg style="width:18px; height:18px; color:var(--text-main);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg> ${(post.views || 0).toLocaleString('id-ID')} Views</span>` : ''}
+            </div>
+
+            <a href="https://instagram.com/p/${post.shortcode}" target="_blank" class="btn-primary" style="justify-content:center; padding:10px 16px; width:100%; text-decoration:none; font-size:0.9rem;">
+              <span>Buka di Instagram</span>
+              <span>↗</span>
+            </a>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('postDetailModal').classList.add('open');
+    }
+
+    function closePostDetailModal() {
+      document.getElementById('postDetailModal').classList.remove('open');
+    }
+
+    function showTopPerformers(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      document.getElementById('dashboardView').style.display = 'none';
+      document.getElementById('topPerformersView').style.display = 'flex';
+
+      document.querySelectorAll('.sidebar-menu .menu-item').forEach(m => m.classList.remove('active'));
+      const topBtn = Array.from(document.querySelectorAll('.sidebar-menu .menu-item')).find(el => el.textContent.includes('Top Performers'));
+      if (topBtn) topBtn.classList.add('active');
+
+      renderTopPerformersTable();
+    }
+
+    function showDashboardView(e) {
+      if (e && e.preventDefault) e.preventDefault();
+      document.getElementById('topPerformersView').style.display = 'none';
+      document.getElementById('dashboardView').style.display = 'flex';
+
+      document.querySelectorAll('.sidebar-menu .menu-item').forEach(m => m.classList.remove('active'));
+      const dashBtn = Array.from(document.querySelectorAll('.sidebar-menu .menu-item')).find(el => el.textContent.includes('Dashboard'));
+      if (dashBtn) dashBtn.classList.add('active');
+    }
+
+    function filterTopPerformers(type, el) {
+      topPerformersFilter = type;
+      if (el) {
+        document.querySelectorAll('#topPerformersView .ig-tab-item').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+      }
+      renderTopPerformersTable();
+    }
+
+    function renderTopPerformersTable() {
+      if (!globalData || !currentBranches.length) return;
+
+      const month = document.getElementById('monthSelect').value || '2026-08';
+      const sortKey = document.getElementById('topSortSelect')?.value || 'likes';
+
+      let allPosts = [];
+      currentBranches.forEach(b => {
+        const slug = b.branch.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+        (b.posts || []).forEach(p => {
+          allPosts.push({
+            ...p,
+            branchName: b.branch,
+            branchSlug: slug,
+            branchUrl: b.url,
+          });
+        });
+      });
+
+      // Filter
+      if (topPerformersFilter === 'reels') allPosts = allPosts.filter(p => p.type === 'reel/video');
+      if (topPerformersFilter === 'posts') allPosts = allPosts.filter(p => p.type !== 'reel/video');
+
+      // Sort
+      allPosts.sort((a, b) => {
+        if (sortKey === 'likes') return (b.likes || 0) - (a.likes || 0);
+        if (sortKey === 'comments') return (b.comments || 0) - (a.comments || 0);
+        if (sortKey === 'views') return (b.views || 0) - (a.views || 0);
+        if (sortKey === 'date') return (b.taken_at || 0) - (a.taken_at || 0);
+        return 0;
+      });
+
+      const top50 = allPosts.slice(0, 50);
+      const tbody = document.getElementById('topPerformersTbody');
+      if (!tbody) return;
+
+      if (!top50.length) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:30px; color:var(--text-muted);">Tidak ada postingan ditemukan.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = top50.map((p, idx) => {
+        const rankNum = idx + 1;
+        let rankBadge = `<span style="font-weight:800; font-size:0.95rem; color:var(--text-muted);">#${rankNum}</span>`;
+        if (rankNum === 1) rankBadge = `<span style="font-size:1.2rem;">🥇</span>`;
+        if (rankNum === 2) rankBadge = `<span style="font-size:1.2rem;">🥈</span>`;
+        if (rankNum === 3) rankBadge = `<span style="font-size:1.2rem;">🥉</span>`;
+
+        const thumbLocal = `/data/${month}/thumbs/${p.branchSlug}/${p.shortcode}.jpg`;
+        const isReel = p.type === 'reel/video';
+        const dateStr = p.taken_at ? new Date((p.taken_at + 8*3600)*1000).toISOString().substring(0, 10) : '-';
+        const captionSnippet = p.caption ? (p.caption.length > 50 ? p.caption.substring(0, 50) + '...' : p.caption) : p.shortcode;
+
+        return `
+          <tr>
+            <td style="text-align:center;">${rankBadge}</td>
+            <td>
+              <div class="branch-cell" style="cursor:pointer;" onclick="openPostDetail('${p.shortcode}', '${p.branchName.replace(/'/g, "\\'")}')">
+                <img src="${thumbLocal}" style="width:44px; height:44px; border-radius:var(--radius-md); object-fit:cover;" onerror="this.onerror=null; this.src='${p.thumb_url || ''}';" alt="${p.shortcode}">
+                <div>
+                  <div style="font-weight:800; color:var(--text-main); font-size:0.875rem;">${p.branchName}</div>
+                  <div style="font-size:0.75rem; color:var(--text-light); max-width:280px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${captionSnippet}</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <span class="tag-pill" style="${isReel ? 'background:#e0f2fe; color:#0369a1;' : 'background:#f3f4f6; color:#6b7280;'} inline-flex; align-items:center; gap:4px;">
+                ${isReel ? '🎬 Reel' : '🖼️ Foto'}
+              </span>
+            </td>
+            <td><strong style="color:var(--primary); font-size:0.95rem;">${(p.likes || 0).toLocaleString('id-ID')}</strong></td>
+            <td><strong>${(p.comments || 0).toLocaleString('id-ID')}</strong></td>
+            <td>${p.views !== null ? formatCompact(p.views) : '-'}</td>
+            <td style="font-size:0.8rem; color:var(--text-muted);">${dateStr}</td>
+            <td style="text-align:right;">
+              <div style="display:flex; justify-content:flex-end; gap:6px;">
+                <button class="btn-outline-sm" onclick="openPostDetail('${p.shortcode}', '${p.branchName.replace(/'/g, "\\'")}')">Preview</button>
+                <a href="https://instagram.com/p/${p.shortcode}" target="_blank" class="btn-outline-sm" style="text-decoration:none;">IG ↗</a>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function scrollToTable() {
+      document.getElementById('tableCard').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'light';
+      const next = current === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+    }
+
+    function formatCompact(num) {
+      if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+      if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+      return num.toString();
+    }
+
+    window.onload = init;
+  </script>
+</body>
+</html>

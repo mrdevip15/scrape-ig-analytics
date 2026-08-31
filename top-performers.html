@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Top Performers Leaderboard - English Academy Instagram Analytics</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-page: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-sidebar: #ffffff;
+      --border-color: #e2e8f0;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --text-light: #94a3b8;
+      --primary: #0095f6;
+      --primary-hover: #0081d6;
+      --primary-light: #e0f2fe;
+      --accent-green: #10b981;
+      --accent-green-light: #ecfdf5;
+      --accent-purple: #8b5cf6;
+      --accent-purple-light: #f5f3ff;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+      --radius-sm: 8px;
+      --radius-md: 12px;
+      --radius-lg: 16px;
+      --radius-full: 9999px;
+    }
+
+    [data-theme="dark"] {
+      --bg-page: #0f172a;
+      --bg-card: #1e293b;
+      --bg-sidebar: #1e293b;
+      --border-color: #334155;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-light: #64748b;
+      --primary: #38bdf8;
+      --primary-hover: #0284c7;
+      --primary-light: rgba(56, 189, 248, 0.15);
+      --accent-green: #34d399;
+      --accent-green-light: rgba(52, 211, 153, 0.15);
+      --accent-purple: #a78bfa;
+      --accent-purple-light: rgba(167, 139, 250, 0.15);
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+      --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif; }
+    body { background-color: var(--bg-page); color: var(--text-main); display: flex; min-height: 100vh; font-size: 14px; transition: background-color 0.2s, color 0.2s; }
+
+    /* Sidebar Navigation */
+    .sidebar { width: 260px; background: var(--bg-sidebar); border-right: 1px solid var(--border-color); display: flex; flex-direction: column; position: fixed; top: 0; bottom: 0; left: 0; z-index: 40; transition: background-color 0.2s, border-color 0.2s; }
+    .brand-header { padding: 20px 24px; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid var(--border-color); }
+    .brand-logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: var(--text-main); font-weight: 800; font-size: 1.1rem; }
+    .brand-logo-icon { background: linear-gradient(135deg, #0095f6, #8b5cf6); color: white; width: 32px; height: 32px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 0.9rem; }
+    .sidebar-menu { padding: 16px 12px; display: flex; flex-direction: column; gap: 4px; flex: 1; overflow-y: auto; }
+    .menu-heading { font-size: 0.7rem; font-weight: 700; color: var(--text-light); text-transform: uppercase; letter-spacing: 0.05em; padding: 16px 12px 6px; }
+    .menu-item { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-radius: var(--radius-sm); text-decoration: none; color: var(--text-muted); font-weight: 600; font-size: 0.875rem; transition: all 0.15s ease; }
+    .menu-item:hover { background: var(--primary-light); color: var(--primary); }
+    .menu-item.active { background: var(--accent-green-light); color: var(--accent-green); font-weight: 700; }
+    .menu-item-left { display: flex; align-items: center; gap: 10px; }
+    .menu-icon { width: 18px; height: 18px; stroke-width: 2; }
+    
+    .sidebar-footer { padding: 16px; border-top: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; }
+    .theme-toggle-btn { background: var(--bg-page); border: 1px solid var(--border-color); color: var(--text-main); padding: 6px 12px; border-radius: var(--radius-sm); font-weight: 600; font-size: 0.8rem; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+
+    /* Main Container */
+    .main-wrapper { flex: 1; margin-left: 260px; display: flex; flex-direction: column; min-width: 0; }
+    .top-header { height: 64px; background: var(--bg-card); border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; padding: 0 32px; position: sticky; top: 0; z-index: 30; }
+    .page-title { font-size: 1.15rem; font-weight: 800; display: flex; align-items: center; gap: 8px; }
+
+    .content-container { padding: 32px; display: flex; flex-direction: column; gap: 24px; max-width: 1400px; margin: 0 auto; width: 100%; }
+
+    /* Cards & Container */
+    .hero-card { background: linear-gradient(135deg, rgba(139,92,246,0.1), rgba(0,149,246,0.1)); border: 1px solid rgba(139,92,246,0.3); border-radius: var(--radius-lg); padding: 24px; }
+    .hero-top { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+    .hero-title { font-size: 1.25rem; font-weight: 800; }
+    
+    .table-container-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); }
+    .data-table-wrapper { overflow-x: auto; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th { background: var(--bg-page); padding: 14px 16px; font-size: 0.75rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; border-bottom: 1px solid var(--border-color); white-space: nowrap; }
+    td { padding: 14px 16px; border-bottom: 1px solid var(--border-color); font-size: 0.875rem; color: var(--text-main); vertical-align: middle; }
+    tr:hover td { background-color: rgba(0, 149, 246, 0.02); }
+
+    .branch-cell { display: flex; align-items: center; gap: 12px; }
+    .tag-pill { display: inline-flex; align-items: center; padding: 4px 10px; border-radius: var(--radius-full); font-size: 0.75rem; font-weight: 700; }
+    .btn-outline-sm { background: transparent; border: 1px solid var(--border-color); color: var(--text-main); padding: 5px 10px; border-radius: var(--radius-sm); font-size: 0.75rem; font-weight: 700; cursor: pointer; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; }
+    .btn-outline-sm:hover { border-color: var(--primary); color: var(--primary); background: var(--primary-light); }
+
+    .month-selector { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-main); padding: 6px 12px; border-radius: var(--radius-sm); font-weight: 700; font-size: 0.85rem; cursor: pointer; outline: none; }
+    .ig-tabs-bar { display: flex; gap: 16px; border-bottom: 1px solid var(--border-color); }
+    .ig-tab-item { padding: 8px 12px; font-weight: 700; font-size: 0.8rem; color: var(--text-muted); cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.15s; }
+    .ig-tab-item.active { color: var(--primary); border-bottom-color: var(--primary); }
+
+    /* Modal Overlay */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; z-index: 100; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; }
+    .modal-overlay.open { opacity: 1; pointer-events: auto; }
+    .modal-card { background: var(--bg-card); border-radius: var(--radius-lg); width: 90%; max-width: 950px; height: 600px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--shadow-lg); }
+
+    .ig-lightbox-container { display: flex; width: 100%; height: 100%; background: #000; }
+    .ig-lightbox-left { flex: 1.2; background: #000; display: flex; align-items: center; justify-content: center; position: relative; }
+    .ig-lightbox-media { max-width: 100%; max-height: 100%; object-fit: contain; }
+    .ig-lightbox-right { flex: 1; background: var(--bg-card); display: flex; flex-direction: column; border-left: 1px solid var(--border-color); }
+    .ig-lightbox-header { padding: 14px 16px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; }
+    .ig-lightbox-author { display: flex; align-items: center; gap: 10px; }
+    .ig-lightbox-avatar { width: 36px; height: 36px; border-radius: var(--radius-full); object-fit: cover; }
+    .ig-lightbox-caption-scroll { flex: 1; padding: 16px; overflow-y: auto; font-size: 0.875rem; line-height: 1.5; color: var(--text-main); }
+    .ig-lightbox-footer { padding: 14px 16px; border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 10px; background: var(--bg-card); }
+    .ig-lightbox-stats { display: flex; align-items: center; gap: 16px; font-weight: 700; font-size: 0.85rem; }
+    .icon-btn { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.2rem; }
+    .btn-primary { background: var(--primary); color: white; padding: 8px 16px; border-radius: var(--radius-sm); font-weight: 700; text-decoration: none; border: none; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; }
+    .btn-primary:hover { background: var(--primary-hover); }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar Nav -->
+  <aside class="sidebar">
+    <div class="brand-header">
+      <a href="./index.html" class="brand-logo">
+        <div class="brand-logo-icon">IG</div>
+        <span>ANALYTICS</span>
+      </a>
+    </div>
+
+    <div class="sidebar-menu">
+      <a href="./index.html" class="menu-item">
+        <div class="menu-item-left">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          <span>Dashboard</span>
+        </div>
+      </a>
+
+      <div class="menu-heading">KATEGORI CABANG</div>
+      
+      <a href="/?cat=makassar" class="menu-item">
+        <div class="menu-item-left">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+          <span>Makassar</span>
+        </div>
+      </a>
+
+      <a href="/?cat=sulawesi" class="menu-item">
+        <div class="menu-item-left">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+          <span>Sulawesi</span>
+        </div>
+      </a>
+
+      <a href="/?cat=maluku" class="menu-item">
+        <div class="menu-item-left">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line></svg>
+          <span>Maluku & Papua</span>
+        </div>
+      </a>
+
+      <div class="menu-heading">ANALYTICS & EXPORT</div>
+
+      <a href="./top-performers.html" class="menu-item active">
+        <div class="menu-item-left">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="currentColor" style="color:var(--accent-purple);"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+          <span>Top Performers</span>
+        </div>
+      </a>
+
+      <a href="./data/2026-08/summary.csv" class="menu-item" download>
+        <div class="menu-item-left">
+          <svg class="menu-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          <span>Export Summary CSV</span>
+        </div>
+      </a>
+    </div>
+
+    <div class="sidebar-footer">
+      <button class="theme-toggle-btn" onclick="toggleTheme()">
+        <span id="themeIcon">🌙</span>
+        <span id="themeText">Dark Mode</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="main-wrapper">
+    <header class="top-header">
+      <div class="page-title">
+        <svg style="width:22px; height:22px; color:var(--accent-purple);" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+        Top Performers Leaderboard
+      </div>
+      <div>
+        <select class="month-selector" id="monthSelect" onchange="loadData()">
+          <option value="2026-08">Bulan: 2026-08</option>
+        </select>
+      </div>
+    </header>
+
+    <main class="content-container">
+      <div class="hero-card">
+        <div class="hero-top">
+          <div>
+            <div class="hero-title" style="display:flex; align-items:center; gap:10px;">
+              <svg style="width:24px; height:24px; color:#8b5cf6;" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+              Top Performing Content Leaderboard
+            </div>
+            <div style="font-size:0.85rem; color:var(--text-muted); margin-top:4px;">
+              Klasemen postingan & Reels dengan perolehan Likes, Komentar, dan Views tertinggi dari seluruh 28 cabang English Academy.
+            </div>
+          </div>
+          <a href="./index.html" class="btn-outline-sm">← Kembali ke Dashboard</a>
+        </div>
+      </div>
+
+      <!-- Collaboration Notice Banner -->
+      <div style="background:var(--primary-light); border:1px solid rgba(0,149,246,0.3); border-radius:var(--radius-md); padding:12px 16px; display:flex; align-items:center; justify-content:space-between; gap:12px; font-size:0.825rem; color:var(--text-main);">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:1.1rem;">ℹ️</span>
+          <span><strong>Catatan Konten Kolaborasi:</strong> Karena Cabang 1 s/d 10 (MKS Cendrawasih s/d Tolitoli) terlanjur discrape sebelum update parser, data kolaborasi tidak tersedia di 10 cabang tersebut. Fitur deteksi konten kolaborasi aktif penuh mulai <strong>Cabang 11 (Kendari) s/d Cabang 28 (Sidrap)</strong>.</span>
+        </div>
+        <span style="cursor:pointer; font-weight:700; opacity:0.6;" onclick="this.parentElement.style.display='none'">✕</span>
+      </div>
+
+      <!-- Filter Bar -->
+      <div class="table-container-card" style="padding:14px 20px;">
+        <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:12px;">
+          <div class="ig-tabs-bar" style="border:none; margin:0; padding:0;">
+            <div class="ig-tab-item active" onclick="filterTopPerformers('all', this)">🔥 SEMUA KONTEN</div>
+            <div class="ig-tab-item" onclick="filterTopPerformers('reels', this)">🎬 TOP REELS</div>
+            <div class="ig-tab-item" onclick="filterTopPerformers('posts', this)">🖼️ TOP FOTO / CAROUSEL</div>
+          </div>
+
+          <div style="display:flex; align-items:center; gap:10px;">
+            <select class="month-selector" id="topSortSelect" onchange="renderTable()" style="padding:6px 12px; font-size:0.8rem;">
+              <option value="likes">Urutkan: Likes Terbanyak ❤️</option>
+              <option value="comments">Urutkan: Komentar Terbanyak 💬</option>
+              <option value="views">Urutkan: Views Terbanyak 👁️</option>
+              <option value="date">Urutkan: Terbaru 📅</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Leaderboard Table -->
+      <div class="table-container-card">
+        <div class="data-table-wrapper">
+          <table>
+            <thead>
+              <tr>
+                <th style="width:60px; text-align:center;">Peringkat</th>
+                <th>Cabang & Konten</th>
+                <th>Tipe</th>
+                <th>Likes ❤️</th>
+                <th>Komentar 💬</th>
+                <th>Views 👁️</th>
+                <th>Tanggal</th>
+                <th style="text-align:right;">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="topPerformersTbody">
+              <!-- Rendered dynamically -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <!-- Lightbox Modal -->
+  <div class="modal-overlay" id="postDetailModal">
+    <div class="modal-card">
+      <div class="ig-lightbox-container" id="postDetailContainer">
+        <!-- Rendered dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let globalData = null;
+    let currentBranches = [];
+    let topFilter = 'all';
+
+    function toggleTheme() {
+      const current = document.documentElement.getAttribute('data-theme') || 'light';
+      const next = current === 'light' ? 'dark' : 'light';
+      document.documentElement.setAttribute('data-theme', next);
+      localStorage.setItem('theme', next);
+      document.getElementById('themeIcon').innerText = next === 'light' ? '🌙' : '☀️';
+      document.getElementById('themeText').innerText = next === 'light' ? 'Dark Mode' : 'Light Mode';
+    }
+
+    async function init() {
+      const savedTheme = localStorage.getItem('theme') || 'light';
+      document.documentElement.setAttribute('data-theme', savedTheme);
+      document.getElementById('themeIcon').innerText = savedTheme === 'light' ? '🌙' : '☀️';
+      document.getElementById('themeText').innerText = savedTheme === 'light' ? 'Dark Mode' : 'Light Mode';
+
+      try {
+        const resMonths = await fetch('/api/months');
+        const months = await resMonths.json();
+        const monthSelect = document.getElementById('monthSelect');
+        if (months.length > 0) {
+          monthSelect.innerHTML = months.map(m => `<option value="${m}">${m}</option>`).join('');
+        }
+      } catch {}
+
+      await loadData();
+    }
+
+        async function loadData() {
+      const month = document.getElementById('monthSelect')?.value || '2026-08';
+      try {
+        let res = await fetch(`/api/dashboard?month=${month}`);
+        if (!res.ok) throw new Error('GitHub Pages Static Mode');
+        globalData = await res.json();
+      } catch (e) {
+        // Fallback for GitHub Pages static hosting
+        const resStatic = await fetch(`./data/${month}/dashboard.json`);
+        globalData = await resStatic.json();
+      }
+      currentBranches = globalData.branches || [];
+      renderTable();
+    } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function filterTopPerformers(type, el) {
+      topFilter = type;
+      if (el) {
+        document.querySelectorAll('.ig-tab-item').forEach(t => t.classList.remove('active'));
+        el.classList.add('active');
+      }
+      renderTable();
+    }
+
+    function formatCompact(num) {
+      if (num === null || num === undefined) return '-';
+      if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
+      if (num >= 1000) return (num / 1000).toFixed(1) + 'K';
+      return num.toString();
+    }
+
+    function renderTable() {
+      if (!globalData || !currentBranches.length) return;
+
+      const month = document.getElementById('monthSelect').value || '2026-08';
+      const sortKey = document.getElementById('topSortSelect')?.value || 'likes';
+
+      let allPosts = [];
+      currentBranches.forEach(b => {
+        const slug = b.branch.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+        (b.posts || []).forEach(p => {
+          allPosts.push({
+            ...p,
+            branchName: b.branch,
+            branchSlug: slug,
+            branchUrl: b.url,
+          });
+        });
+      });
+
+      if (topFilter === 'reels') allPosts = allPosts.filter(p => p.type === 'reel/video');
+      if (topFilter === 'posts') allPosts = allPosts.filter(p => p.type !== 'reel/video');
+
+      allPosts.sort((a, b) => {
+        if (sortKey === 'likes') return (b.likes || 0) - (a.likes || 0);
+        if (sortKey === 'comments') return (b.comments || 0) - (a.comments || 0);
+        if (sortKey === 'views') return (b.views || 0) - (a.views || 0);
+        if (sortKey === 'date') return (b.taken_at || 0) - (a.taken_at || 0);
+        return 0;
+      });
+
+      const top50 = allPosts.slice(0, 50);
+      const tbody = document.getElementById('topPerformersTbody');
+      if (!tbody) return;
+
+      if (!top50.length) {
+        tbody.innerHTML = `<tr><td colspan="8" style="text-align:center; padding:30px; color:var(--text-muted);">Tidak ada postingan ditemukan.</td></tr>`;
+        return;
+      }
+
+      tbody.innerHTML = top50.map((p, idx) => {
+        const rankNum = idx + 1;
+        let rankBadge = `<span style="font-weight:800; font-size:0.95rem; color:var(--text-muted);">#${rankNum}</span>`;
+        if (rankNum === 1) rankBadge = `<span style="font-size:1.2rem;">🥇</span>`;
+        if (rankNum === 2) rankBadge = `<span style="font-size:1.2rem;">🥈</span>`;
+        if (rankNum === 3) rankBadge = `<span style="font-size:1.2rem;">🥉</span>`;
+
+        const thumbLocal = `/data/${month}/thumbs/${p.branchSlug}/${p.shortcode}.jpg`;
+        const isReel = p.type === 'reel/video';
+        const dateStr = p.taken_at ? new Date((p.taken_at + 8*3600)*1000).toISOString().substring(0, 10) : '-';
+        const captionSnippet = p.caption ? (p.caption.length > 50 ? p.caption.substring(0, 50) + '...' : p.caption) : p.shortcode;
+
+        return `
+          <tr>
+            <td style="text-align:center;">${rankBadge}</td>
+            <td>
+              <div class="branch-cell" style="cursor:pointer;" onclick="openPostDetail('${p.shortcode}', '${p.branchName.replace(/'/g, "\\'")}')">
+                <img src="${thumbLocal}" style="width:44px; height:44px; border-radius:var(--radius-md); object-fit:cover;" onerror="this.onerror=null; this.src='${p.thumb_url || ''}';" alt="${p.shortcode}">
+                <div>
+                  <div style="font-weight:800; color:var(--text-main); font-size:0.875rem;">${p.branchName}</div>
+                  <div style="font-size:0.75rem; color:var(--text-light); max-width:280px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;">${captionSnippet}</div>
+                </div>
+              </div>
+            </td>
+            <td>
+              <div style="display:flex; flex-direction:column; gap:4px; align-items:flex-start;">
+                <span class="tag-pill" style="${isReel ? 'background:#e0f2fe; color:#0369a1;' : (p.type === 'carousel' ? 'background:#e0e7ff; color:#4338ca;' : 'background:#f3f4f6; color:#6b7280;')} inline-flex; align-items:center; gap:4px;">
+                  ${isReel ? '🎬 Reel' : (p.type === 'carousel' ? `🖼️ Carousel (${p.carousel_count || ''} Slide)` : '📷 Foto Single')}
+                </span>
+                ${p.is_collaboration ? `<span class="tag-pill" style="background:#fce7f3; color:#be185d; font-size:0.68rem; padding:2px 8px;">🤝 Kolaborasi</span>` : ''}
+              </div>
+            </td>
+            <td><strong style="color:var(--primary); font-size:0.95rem;">${(p.likes || 0).toLocaleString('id-ID')}</strong></td>
+            <td><strong>${(p.comments || 0).toLocaleString('id-ID')}</strong></td>
+            <td>${isReel ? formatCompact(p.views || 0) : '-'}</td>
+            <td style="font-size:0.8rem; color:var(--text-muted);">${dateStr}</td>
+            <td style="text-align:right;">
+              <div style="display:flex; justify-content:flex-end; gap:6px;">
+                <button class="btn-outline-sm" onclick="openPostDetail('${p.shortcode}', '${p.branchName.replace(/'/g, "\\'")}')">Preview</button>
+                <a href="https://instagram.com/p/${p.shortcode}" target="_blank" class="btn-outline-sm" style="text-decoration:none;">IG ↗</a>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    function openPostDetail(shortcode, branchName) {
+      const b = currentBranches.find(item => item.branch === branchName);
+      if (!b) return;
+
+      const post = b.posts?.find(p => p.shortcode === shortcode);
+      if (!post) return;
+
+      const month = document.getElementById('monthSelect').value || '2026-08';
+      const slug = b.branch.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+      const masterInfo = globalData.followers_master?.branches?.[b.branch] || {};
+
+      const avatarSrc = masterInfo.profile_pic_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(b.branch)}&background=0095f6&color=fff&size=128`;
+      const handle = masterInfo.username || b.url.match(/instagram\.com\/([^/]+)/)?.[1] || slug;
+      const thumbLocal = `/data/${month}/thumbs/${slug}/${post.shortcode}.jpg`;
+      const dateStr = post.taken_at ? new Date((post.taken_at + 8*3600)*1000).toISOString().replace('T', ' ').substring(0, 10) : '-';
+      const captionText = post.caption || 'Tidak ada deskripsi caption.';
+
+      const container = document.getElementById('postDetailContainer');
+      const isReel = post.type === 'reel/video';
+      const typeLabel = isReel ? '🎬 Reel' : (post.type === 'carousel' ? `🖼️ Carousel (${post.carousel_count || ''} Slide)` : '📷 Foto Single');
+
+      const hashtagsHtml = (post.hashtags && post.hashtags.length > 0)
+        ? `<div style="margin-top:10px; display:flex; flex-wrap:wrap; gap:4px;">
+            ${post.hashtags.map(h => `<span style="background:var(--primary-light); color:var(--primary); font-size:0.75rem; padding:2px 8px; border-radius:12px; font-weight:700;">${h}</span>`).join('')}
+           </div>`
+        : '';
+
+      const collabBadge = post.is_collaboration
+        ? `<span style="background:#fce7f3; color:#be185d; padding:2px 6px; border-radius:10px; font-size:0.68rem; font-weight:700;">🤝 Kolaborasi ${post.coauthors?.length ? '(@' + post.coauthors.join(', @') + ')' : ''}</span>`
+        : '';
+
+      container.innerHTML = `
+        <div class="ig-lightbox-left">
+          <img src="${thumbLocal}" class="ig-lightbox-media" onerror="this.onerror=null; this.src='${post.thumb_url || ''}';" alt="${post.shortcode}">
+          <div class="ig-type-badge" style="top:12px; right:12px;">${typeLabel}</div>
+        </div>
+        <div class="ig-lightbox-right">
+          <div class="ig-lightbox-header">
+            <div class="ig-lightbox-author">
+              <img src="${avatarSrc}" class="ig-lightbox-avatar" onerror="this.onerror=null; this.src='https://ui-avatars.com/api/?name=${encodeURIComponent(b.branch)}&background=0D9488&color=fff';" alt="${b.branch}">
+              <div>
+                <div style="font-weight:700; font-size:0.9rem; display:flex; align-items:center; gap:6px;">
+                  <span>${handle}</span>
+                  ${post.is_pinned ? '<span style="background:#fef3c7; color:#d97706; padding:2px 6px; border-radius:10px; font-size:0.68rem; font-weight:700;">📌 Pinned</span>' : ''}
+                  ${collabBadge}
+                </div>
+                <div style="font-size:0.75rem; color:var(--text-muted);">${dateStr}</div>
+              </div>
+            </div>
+            <button class="icon-btn" onclick="closePostDetailModal()">✕</button>
+          </div>
+
+          <div class="ig-lightbox-caption-scroll">
+            <div style="font-weight:700; margin-bottom:8px; display:flex; align-items:center; gap:6px;">
+              <span>${handle}</span>
+              ${post.carousel_count ? `<span style="background:#e0e7ff; color:#4338ca; padding:2px 6px; border-radius:10px; font-size:0.68rem; font-weight:700;">${post.carousel_count} Slide</span>` : ''}
+              ${post.video_duration ? `<span style="background:#f3e8ff; color:#6b21a8; padding:2px 6px; border-radius:10px; font-size:0.68rem; font-weight:700;">⏱️ ${Math.round(post.video_duration)}s</span>` : ''}
+            </div>
+            <div>${captionText}</div>
+            ${hashtagsHtml}
+          </div>
+
+          <div class="ig-lightbox-footer">
+            <div class="ig-lightbox-stats">
+              <span style="display:inline-flex; align-items:center; gap:4px;"><svg style="width:18px; height:18px; color:#ef4444; fill:currentColor;" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg> ${(post.likes || 0).toLocaleString('id-ID')} Likes</span>
+              <span style="display:inline-flex; align-items:center; gap:4px;"><svg style="width:18px; height:18px; color:var(--text-main);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18z"/></svg> ${(post.comments || 0).toLocaleString('id-ID')} Komentar</span>
+              ${isReel ? `<span style="display:inline-flex; align-items:center; gap:4px;"><svg style="width:18px; height:18px; color:var(--text-main);" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/></svg> ${(post.views || 0).toLocaleString('id-ID')} Views</span>` : ''}
+            </div>
+
+            <a href="https://instagram.com/p/${post.shortcode}" target="_blank" class="btn-primary" style="justify-content:center; padding:10px 16px; width:100%; text-decoration:none; font-size:0.9rem;">
+              <span>Buka di Instagram</span>
+              <span>↗</span>
+            </a>
+          </div>
+        </div>
+      `;
+
+      document.getElementById('postDetailModal').classList.add('open');
+    }
+
+    function closePostDetailModal() {
+      document.getElementById('postDetailModal').classList.remove('open');
+    }
+
+    init();
+  </script>
+</body>
+</html>
