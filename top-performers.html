@@ -113,7 +113,7 @@
     .ig-lightbox-header { padding: 14px 16px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between; }
     .ig-lightbox-author { display: flex; align-items: center; gap: 10px; }
     .ig-lightbox-avatar { width: 36px; height: 36px; border-radius: var(--radius-full); object-fit: cover; }
-    .ig-lightbox-caption-scroll { flex: 1; padding: 16px; overflow-y: auto; font-size: 0.875rem; line-height: 1.5; color: var(--text-main); }
+    .ig-lightbox-caption-scroll { flex: 1; padding: 16px; overflow-y: auto; font-size: 0.875rem; line-height: 1.5; color: var(--text-main); white-space: pre-wrap; }
     .ig-lightbox-footer { padding: 14px 16px; border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 10px; background: var(--bg-card); }
     .ig-lightbox-stats { display: flex; align-items: center; gap: 16px; font-weight: 700; font-size: 0.85rem; }
     .icon-btn { background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.2rem; }
@@ -320,13 +320,22 @@
     async function loadData() {
       const month = document.getElementById('monthSelect').value || '2026-08';
       try {
-        const res = await fetch(`/api/dashboard?month=${month}`);
+        let res = await fetch(`/api/dashboard?month=${month}`);
+        if (!res.ok) throw new Error('GitHub Pages Static Mode');
         globalData = await res.json();
-        currentBranches = globalData.branches || [];
-        renderTable();
       } catch (e) {
-        console.error(e);
+        try {
+          const resStatic = await fetch(`./data/${month}/dashboard.json`);
+          if (!resStatic.ok) throw new Error('Static data fetch failed');
+          globalData = await resStatic.json();
+        } catch (err) {
+          console.error('Failed to load static dashboard:', err);
+          return;
+        }
       }
+
+      currentBranches = globalData.branches || [];
+      renderTable();
     }
 
     function filterTopPerformers(type, el) {
@@ -446,7 +455,7 @@
       const handle = masterInfo.username || b.url.match(/instagram\.com\/([^/]+)/)?.[1] || slug;
       const thumbLocal = `/data/${month}/thumbs/${slug}/${post.shortcode}.jpg`;
       const dateStr = post.taken_at ? new Date((post.taken_at + 8*3600)*1000).toISOString().replace('T', ' ').substring(0, 10) : '-';
-      const captionText = post.caption || 'Tidak ada deskripsi caption.';
+      const captionText = (post.caption || 'Tidak ada deskripsi caption.').replace(/\n/g, '<br>');
 
       const container = document.getElementById('postDetailContainer');
       const isReel = post.type === 'reel/video';
