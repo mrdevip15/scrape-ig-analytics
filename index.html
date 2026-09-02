@@ -1780,7 +1780,7 @@
 
       const handle = masterInfo.username || b.url.match(/instagram\.com\/([^/]+)/)?.[1] || slug;
       const fullName = masterInfo.full_name || `English Academy ${b.branch}`;
-      const bioText = masterInfo.biography || 'Kursus Bahasa Inggris Tatap Muka & Online Terbaik by Ruangguru.';
+      const bioText = (masterInfo.biography || 'Kursus Bahasa Inggris Tatap Muka & Online Terbaik by Ruangguru.').replace(/\n/g, '<br>');
       const category = masterInfo.category || 'Pendidikan / Kursus Bahasa Inggris';
       const followersCount = (masterInfo.followers || b.summary?.followers || 0).toLocaleString('id-ID');
       const followingCount = masterInfo.following ? masterInfo.following.toLocaleString('id-ID') : '-';
@@ -1914,7 +1914,7 @@
       const handle = masterInfo.username || b.url.match(/instagram\.com\/([^/]+)/)?.[1] || slug;
       const thumbLocal = `/data/${month}/thumbs/${slug}/${post.shortcode}.jpg`;
       const dateStr = post.taken_at ? new Date((post.taken_at + 8*3600)*1000).toISOString().replace('T', ' ').substring(0, 10) : '-';
-      const captionText = post.caption || 'Tidak ada deskripsi caption.';
+      const captionText = (post.caption || 'Tidak ada deskripsi caption.').replace(/\n/g, '<br>');
 
       const container = document.getElementById('postDetailContainer');
       const isReel = post.type === 'reel/video';
