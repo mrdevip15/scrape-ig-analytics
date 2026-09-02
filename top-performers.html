@@ -320,13 +320,22 @@
     async function loadData() {
       const month = document.getElementById('monthSelect').value || '2026-08';
       try {
-        const res = await fetch(`/api/dashboard?month=${month}`);
+        let res = await fetch(`/api/dashboard?month=${month}`);
+        if (!res.ok) throw new Error('GitHub Pages Static Mode');
         globalData = await res.json();
-        currentBranches = globalData.branches || [];
-        renderTable();
       } catch (e) {
-        console.error(e);
+        try {
+          const resStatic = await fetch(`./data/${month}/dashboard.json`);
+          if (!resStatic.ok) throw new Error('Static data fetch failed');
+          globalData = await resStatic.json();
+        } catch (err) {
+          console.error('Failed to load static dashboard:', err);
+          return;
+        }
       }
+
+      currentBranches = globalData.branches || [];
+      renderTable();
     }
 
     function filterTopPerformers(type, el) {
